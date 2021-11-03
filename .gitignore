@@ -58,3 +58,5 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+ProjectSettings/AutoStreamingSettings.asset
+ProjectSettings/ProjectVersion.txt
