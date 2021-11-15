@@ -83,6 +83,9 @@ public class Hexagrid : MonoBehaviour
     public bool bTriangulation = true;
     public bool bRemovingEdges = false;
     public bool bSubdivideFaces = false;
+
+    [Range(1, 100)]
+    public int iterNum = 10;
     public bool bRelax = false;
     public bool bReshape = false;
     public bool bDrawPositions = false;
@@ -455,6 +458,7 @@ public class Hexagrid : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        /*
         if (bTriangulation && bRemovingEdges && bSubdivideFaces && bRelax)
         {
             if (bRelax)
@@ -466,6 +470,7 @@ public class Hexagrid : MonoBehaviour
                 this.Reshape();
             }
         }
+        */
     }
 
     private void OnValidate()
@@ -478,14 +483,39 @@ public class Hexagrid : MonoBehaviour
         if (bTriangulation)
         {
             this.Triangulation();
+
+            if (bRemovingEdges)
+            {
+                this.RemovingEdges();
+
+                if (bSubdivideFaces)
+                {
+                    this.SubdivideFaces();
+
+                    if (bRelax)
+                    {
+                        if (bReshape)
+                        {
+                            for (int i = 0; i < iterNum; i++)
+                            {
+                                this.Reshape();
+                                this.Relax();
+                            }
+                        }
+                        else
+                        {
+                            for (int i = 0; i < iterNum; i++)
+                            {
+                                this.Relax();
+                            }
+                        }
+                        
+                    }
+                }
+            }
         }
-        if (bTriangulation && bRemovingEdges)
-        {
-            this.RemovingEdges();
-        }
-        if (bTriangulation && bRemovingEdges && bSubdivideFaces)
-        {
-            this.SubdivideFaces();
-        }
+        
+        
+        
     }
 }
