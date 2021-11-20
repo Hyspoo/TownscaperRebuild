@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
  
-[CustomEditor(typeof(MeshCreator))]
+[CustomEditor(typeof(GridCreator))]
 public class GeneratorEditor : Editor 
 {
 	public override void OnInspectorGUI()
 	{
 		DrawDefaultInspector ();
+		//base.OnInspectorGUI();
  
-		MeshCreator script = (MeshCreator)target;
-		if (GUILayout.Button("Create Mesh"))
+		GridCreator script = target as GridCreator;
+		if (GUILayout.Button("Create Grid"))
 		{
-			script.CreateMesh ();
+			script.CreateGroundGrid ();
 		}
 	}
 }

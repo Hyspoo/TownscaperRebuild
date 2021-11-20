@@ -95,6 +95,28 @@ public class Hexagrid : MonoBehaviour
     private List<Quad> mQuads;
     private Neighbours[] mNeighbours;
 
+    public Vector3[] getPoints()
+    {
+        Vector3[] pointsPos = new Vector3[mPoints.Count];
+        for (int i = 0; i < mPoints.Count; i++)
+        {
+            pointsPos[i] = new Vector3(mPoints[i].mPosition.x, 0, mPoints[i].mPosition.y);
+        }
+        return pointsPos;
+    }
+
+    public int[] getTriangles()
+    {
+        int[] trianglesIndex = new int[mTriangles.Count];
+        for (int i = 0; i < mTriangles.Count * 3; i++)
+        {
+            trianglesIndex[i*3] = mTriangles[i].mA;
+            trianglesIndex[i*3 + 1] = mTriangles[i].mB;
+            trianglesIndex[i*3 + 2] = mTriangles[i].mC;
+        }
+        return trianglesIndex;
+    }
+
     void Triangulation()
     {
         mPoints = new List<Point>();
@@ -399,7 +421,9 @@ public class Hexagrid : MonoBehaviour
 
     private void DrawLine(int a, int b)
     {
-        Gizmos.DrawLine(mPoints[a].mPosition, mPoints[b].mPosition);
+        Vector3 posA = new Vector3(mPoints[a].mPosition.x, 0 ,mPoints[a].mPosition.y);
+        Vector3 posB = new Vector3(mPoints[b].mPosition.x, 0 ,mPoints[b].mPosition.y);
+        Gizmos.DrawLine(posA, posB);
     }
 
     void OnDrawGizmos()
@@ -407,15 +431,18 @@ public class Hexagrid : MonoBehaviour
         bool hidePoint = !bDrawPositions;
         bool hideSector = bTriangulation && bRemovingEdges && bSubdivideFaces && bRelax;
 
-        Gizmos.color = Color.green;
+        Gizmos.color = Color.yellow;
 
         if (!hidePoint)
         {
             foreach (var point in mPoints)
             {
-                Gizmos.DrawSphere(point.mPosition, 0.1f);  //����1�������꣬����2���ư뾶
+                Vector3 pos = new Vector3(point.mPosition.x, 0, point.mPosition.y);
+                Gizmos.DrawSphere(pos, 0.1f);
             }
         }
+
+        Gizmos.color = Color.green;
 
         if (!hideSector)
         {
@@ -448,29 +475,6 @@ public class Hexagrid : MonoBehaviour
                 }
             }
         }
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        /*
-        if (bTriangulation && bRemovingEdges && bSubdivideFaces && bRelax)
-        {
-            if (bRelax)
-            {
-                this.Relax();
-            }
-            if (bRelax && bReshape)
-            {
-                this.Reshape();
-            }
-        }
-        */
     }
 
     private void OnValidate()
@@ -518,4 +522,5 @@ public class Hexagrid : MonoBehaviour
         
         
     }
+
 }
