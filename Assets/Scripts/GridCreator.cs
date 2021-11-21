@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEditor;
+using VisualDebugging.Example;
 
 public class GridCreator : MonoBehaviour
 {
+	/*
     public Hexagrid grid;
 
     public int width = 10;
@@ -73,5 +75,17 @@ public class GridCreator : MonoBehaviour
 		mesh.triangles = triangles;	//三角面
 		mesh.RecalculateNormals ();	//计算法线
     }
+	*/
 
+	public int sideSize;
+
+	public void VerticesDebug()
+	{
+		HexagridAlgorithm.GenerateVertices(sideSize);
+	}
+
+	public void TrianglesDebug()
+	{
+		HexagridAlgorithm.GenerateTriangles(sideSize);
+	}
 }

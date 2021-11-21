@@ -170,7 +170,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 646326881}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.08, y: -5.92, z: 0}
+  m_LocalPosition: {x: 0.08, y: -5.92, z: 0.72}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -362,6 +362,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1056632674}
   - component: {fileID: 1056632671}
+  - component: {fileID: 1056632672}
   m_Layer: 0
   m_Name: Chunk
   m_TagString: Untagged
@@ -381,9 +382,296 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c026ffb964aa8c44a7a7b0fa79dcc54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  grid: {fileID: 646326882}
-  width: 10
-  height: 10
+  sideSize: 4
+--- !u!114 &1056632672
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1056632670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 931306df8d9c44f48b8902a460582eca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  frames:
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 0
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 1
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 2
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 3
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 4
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 5
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 6
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 7
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 8
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 9
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 10
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 11
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 12
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 13
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 14
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 15
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 16
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 17
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 18
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 19
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 20
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 21
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 22
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 23
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 24
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 25
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 26
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 27
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 28
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 29
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 30
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 31
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 32
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 33
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 34
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 35
+  - description: Draw point
+    keepInBackground: 1
+    myFrameIndex: 36
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 37
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 38
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 39
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 40
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 41
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 42
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 43
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 44
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 45
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 46
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 47
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 48
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 49
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 50
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 51
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 52
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 53
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 54
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 55
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 56
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 57
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 58
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 59
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 60
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 61
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 62
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 63
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 64
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 65
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 66
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 67
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 68
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 69
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 70
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 71
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 72
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 73
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 74
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 75
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 76
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 77
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 78
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 79
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 80
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 81
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 82
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 83
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 84
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 85
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 86
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 87
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 88
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 89
+  - description: Draw Triangle
+    keepInBackground: 1
+    myFrameIndex: 90
+  frameIndex: 56
+  timeBetweenFrames: 0.05
+  loop: 0
 --- !u!4 &1056632674
 Transform:
   m_ObjectHideFlags: 0

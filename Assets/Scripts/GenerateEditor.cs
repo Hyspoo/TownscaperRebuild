@@ -12,9 +12,9 @@ public class GeneratorEditor : Editor
 		//base.OnInspectorGUI();
  
 		GridCreator script = target as GridCreator;
-		if (GUILayout.Button("Create Grid"))
+		if (GUILayout.Button("Create Vertices"))
 		{
-			script.CreateGroundGrid ();
+			script.TrianglesDebug ();
 		}
 	}
 }
