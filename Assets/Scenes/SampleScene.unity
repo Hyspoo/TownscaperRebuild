@@ -382,7 +382,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c026ffb964aa8c44a7a7b0fa79dcc54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sideSize: 4
+  sideSize: 3
 --- !u!114 &1056632672
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -453,58 +453,58 @@ MonoBehaviour:
   - description: Draw point
     keepInBackground: 1
     myFrameIndex: 18
-  - description: Draw point
+  - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 19
-  - description: Draw point
+  - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 20
-  - description: Draw point
+  - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 21
-  - description: Draw point
+  - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 22
-  - description: Draw point
+  - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 23
-  - description: Draw point
+  - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 24
-  - description: Draw point
+  - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 25
-  - description: Draw point
+  - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 26
-  - description: Draw point
+  - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 27
-  - description: Draw point
+  - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 28
-  - description: Draw point
+  - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 29
-  - description: Draw point
+  - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 30
-  - description: Draw point
+  - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 31
-  - description: Draw point
+  - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 32
-  - description: Draw point
+  - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 33
-  - description: Draw point
+  - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 34
-  - description: Draw point
+  - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 35
-  - description: Draw point
+  - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 36
   - description: Draw Triangle
@@ -669,7 +669,7 @@ MonoBehaviour:
   - description: Draw Triangle
     keepInBackground: 1
     myFrameIndex: 90
-  frameIndex: 56
+  frameIndex: -1
   timeBetweenFrames: 0.05
   loop: 0
 --- !u!4 &1056632674

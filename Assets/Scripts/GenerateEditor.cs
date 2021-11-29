@@ -14,7 +14,30 @@ public class GeneratorEditor : Editor
 		GridCreator script = target as GridCreator;
 		if (GUILayout.Button("Create Vertices"))
 		{
-			script.TrianglesDebug ();
+			script.GetVertices();
+		}
+
+		if (GUILayout.Button("Create Triangles"))
+		{
+			script.GetTriangles();
+		}
+
+		if (GUILayout.Button("Show current Vertices"))
+		{
+			script.VertexDebug();
+		}
+
+		if (GUILayout.Button("Show current Triangles"))
+		{
+			script.TriangleDebug();
+		}
+
+
+
+		// Reset
+		if (GUILayout.Button("Reset"))
+		{
+			script.Reset();
 		}
 	}
 }
