@@ -4,24 +4,25 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEditor;
+using VisualDebugging.Example;
 
-class Point
+public class Point
 {
-    public Point(float x, float y, bool s)
+    public Point(float x, float y, float z, bool s)
     {
-        mPosition = new Vector2(x, y);
+        mPosition = new Vector3(x, y, z);
         mSide = s;
     }
-    public Point(Vector2 p, bool s)
+    public Point(Vector3 p, bool s)
     {
         mPosition = p;
         mSide = s;
     }
-    public Vector2 mPosition;
+    public Vector3 mPosition;
     public bool mSide;
 };
 
-class Triangle
+public class Triangle
 {
     public Triangle(int a, int b, int c)
     {
@@ -34,7 +35,7 @@ class Triangle
     public bool mValid;
 };
 
-class Quad
+public class Quad
 {
     public Quad(int a, int b, int c, int d)
     {
@@ -46,7 +47,7 @@ class Quad
     public int mA, mB, mC, mD;
 };
 
-class Neighbours
+public class Neighbours
 {
     public Neighbours()
     {
@@ -66,11 +67,10 @@ class Neighbours
     public List<int> mNeighbour;
 };
 
-[ExecuteInEditMode]
-public class Hexagrid : MonoBehaviour
+public class GridGenerator : MonoBehaviour
 {
-    [Range(2, 12)]
-    public int mSideSize = 8;
+	[Range(2, 12)]
+    public int mSideSize = 6;
 
     [Range(1, 20)]
     public int mSearchIterationCount = 12;
@@ -78,70 +78,43 @@ public class Hexagrid : MonoBehaviour
     [Range(0, 65535)]
     public int mSeed = 15911;
 
-    private int mBaseQuadCount = 0;
-
-    public bool bTriangulation = true;
-    public bool bRemovingEdges = false;
-    public bool bSubdivideFaces = false;
+    //private int mBaseQuadCount = 0;
 
     [Range(1, 100)]
-    public int iterNum = 10;
-    public bool bRelax = false;
-    public bool bReshape = false;
-    public bool bDrawPositions = false;
+    public int iterNum = 20;
+
+    public int debugPointIndex;
 
     private List<Point> mPoints;
     private List<Triangle> mTriangles;
-    private List<Quad> mQuads;
+    private List<Quad> mBaseQuads;
+    private List<Quad> mSubQuads;
     private Neighbours[] mNeighbours;
 
-    public Vector3[] getPoints()
-    {
-        Vector3[] pointsPos = new Vector3[mPoints.Count];
-        for (int i = 0; i < mPoints.Count; i++)
-        {
-            pointsPos[i] = new Vector3(mPoints[i].mPosition.x, 0, mPoints[i].mPosition.y);
-        }
-        return pointsPos;
-    }
+    private GameObject centerLocator;
+	
+	public void InitializeHexagrid()
+	{
+		ResetGrid();
 
-    public int[] getTriangles()
-    {
-        int[] trianglesIndex = new int[mTriangles.Count];
-        for (int i = 0; i < mTriangles.Count * 3; i++)
-        {
-            trianglesIndex[i*3] = mTriangles[i].mA;
-            trianglesIndex[i*3 + 1] = mTriangles[i].mB;
-            trianglesIndex[i*3 + 2] = mTriangles[i].mC;
-        }
-        return trianglesIndex;
-    }
+		if (mSideSize < 2) throw (new ArgumentException("Generate fail! Your input size is less than 2."));
 
-    void Triangulation()
-    {
-        mPoints = new List<Point>();
-        mTriangles = new List<Triangle>();
-        mQuads = new List<Quad>();
-        mNeighbours = new Neighbours[0];
+		float sideLength = 0.5f * Mathf.Tan(Mathf.Deg2Rad * 60); // 0.5f* tanf(60deg)
 
-        if (mSideSize < 2)
-        {
-            return;
-        }
-
-        float sideLength = 0.5f * Mathf.Tan(Mathf.Deg2Rad * 60); // 0.5f* tanf(60deg)
-        for (int x = 0; x < mSideSize * 2 - 1; ++x)
+		// Set Points
+		for (int x = 0; x < mSideSize * 2 - 1; ++x)
         {
             int height = (x < mSideSize) ? (mSideSize + x) : (mSideSize * 3 - 2 - x);
             float deltaHeight = mSideSize - height * 0.5f;
-            for (int y = 0; y < height; y++)
+            for (int z = 0; z < height; z++)
             {
-                bool isSide = x == 0 || x == (mSideSize * 2 - 2) || y == 0 || y == height - 1;
-                mPoints.Add(new Point((x - mSideSize + 1) * sideLength, y + deltaHeight, isSide));
+                bool isSide = x == 0 || x == (mSideSize * 2 - 2) || z == 0 || z == height - 1;
+                mPoints.Add(new Point((x - mSideSize + 1) * sideLength, 0, z + deltaHeight, isSide));
             }
         }
 
-        int offset = 0;
+		// Set Triangles
+		int offset = 0;
         for (int x = 0; x < (mSideSize * 2 - 2); x++)
         {
             int height = (x < mSideSize) ? (mSideSize + x) : (mSideSize * 3 - 2 - x);
@@ -173,9 +146,13 @@ public class Hexagrid : MonoBehaviour
             }
             offset += height;
         }
-    }
 
-    private int[] GetAdjacentTriangles(int triIndex)
+        DestroyImmediate(GameObject.Find("CenterLocator"));
+        centerLocator = new GameObject("CenterLocator");
+        centerLocator.GetComponent<Transform>().Translate(mPoints[(mPoints.Count - 1) / 2].mPosition);
+	}
+
+	private int[] GetAdjacentTriangles(int triIndex)
     {
         List<int> adjacents = new List<int>();
 
@@ -215,9 +192,9 @@ public class Hexagrid : MonoBehaviour
         return adjacents.ToArray();
     }
 
-    void RemovingEdges()
-    {
-        // triangles to quads
+	public void RemovingEdges()
+	{
+		// triangles to quads
         System.Random rand = new System.Random(mSeed);
         while (true)
         {
@@ -225,7 +202,7 @@ public class Hexagrid : MonoBehaviour
             int searchCount = 0;
             do
             {
-                triIndex = rand.Next() % mTriangles.Count;
+                triIndex = rand.Next() % mTriangles.Count();
                 searchCount++;
             } while (searchCount < mSearchIterationCount && !mTriangles[triIndex].mValid);
 
@@ -248,15 +225,15 @@ public class Hexagrid : MonoBehaviour
                 int[] unique = indices.Distinct().ToArray();
                 Debug.Assert(unique.Length == 4);
 
-                mQuads.Add(new Quad(unique[0], unique[2], unique[3], unique[1]));
+                mBaseQuads.Add(new Quad(unique[0], unique[2], unique[3], unique[1]));
                 mTriangles[triIndex].mValid = false; ;
                 mTriangles[adjacents[0]].mValid = false;
             }
         }
-        this.mBaseQuadCount = mQuads.Count();
-    }
+        //this.mBaseQuadCount = mBaseQuads.Count();
+	}
 
-    void Subdivide(int[] indices, Dictionary<UInt32, int> middles)
+	void Subdivide(int[] indices, Dictionary<UInt32, int> middles)
     {
         // Example: indices -> Point{4, 5, 6, 7}
         int count = indices.Length;
@@ -265,7 +242,7 @@ public class Hexagrid : MonoBehaviour
         // add midpoint on face center to global mPoint
         int indexCenter = mPoints.Count;
         {
-            Vector2 ptCenter = Vector2.zero;
+            Vector3 ptCenter = Vector3.zero;
             foreach (int i in indices)
             {
                 ptCenter += mPoints[i].mPosition;
@@ -297,18 +274,18 @@ public class Hexagrid : MonoBehaviour
         {
             int indexA = x;
             int indexB = (x + 1) % count;
-            mQuads.Add(new Quad(indexCenter, halfSegmentIndex[indexA], indices[indexB], halfSegmentIndex[indexB]));
+            mSubQuads.Add(new Quad(indexCenter, halfSegmentIndex[indexA], indices[indexB], halfSegmentIndex[indexB]));
         }
     }
 
-    void SubdivideFaces()
+    public void SubdivideFaces()
     {
         Dictionary<UInt32, int> middles = new Dictionary<UInt32, int>();
 
         // quads to 4 quads
-        for (int i = 0; i < mBaseQuadCount; i++)
+        for (int i = 0; i < mBaseQuads.Count(); i++)
         {
-            var quad = mQuads[i];
+            var quad = mBaseQuads[i];
             int[] indices = new int[4] {
                 quad.mA, quad.mB, quad.mC, quad.mD
             };
@@ -328,16 +305,16 @@ public class Hexagrid : MonoBehaviour
         }
     }
 
-    void Relax()
+    void MovePointsToNeighboursAverage()
     {
         mNeighbours = new Neighbours[mPoints.Count];
         for (int i = 0; i < mPoints.Count; ++i)
         {
             mNeighbours[i] = new Neighbours();
         }
-        for (int i = mBaseQuadCount; i < mQuads.Count(); ++i)
+        for (int i = 0; i < mSubQuads.Count(); ++i)
         {
-            var quad = mQuads[i];
+            var quad = mSubQuads[i];
             int[] indices = new int[4] {
                 quad.mA, quad.mB, quad.mC, quad.mD
             };
@@ -391,7 +368,7 @@ public class Hexagrid : MonoBehaviour
                 continue;
             }
             var neighbour = mNeighbours[i];
-            Vector2 sum = Vector2.zero;
+            Vector3 sum = Vector3.zero;
             for (int j = 0; j < neighbour.count; j++)
             {
                 sum += mPoints[neighbour.mNeighbour[j]].mPosition;
@@ -401,126 +378,98 @@ public class Hexagrid : MonoBehaviour
         }
     }
 
-    void Reshape()
+	public void Relax()
+	{
+		for (int i = 0; i < iterNum; i++)
+        {
+            this.MovePointsToNeighboursAverage();
+        }
+	}
+
+    void MoveEdgePointsToCircle()
     {
         float radius = mSideSize - 1.0f;
-        Vector2 center = new Vector2(0, (mSideSize * 2 - 1) * 0.5f);
+        Vector3 center = new Vector3(0, 0, (mSideSize * 2 - 1) * 0.5f);
 
         // for (int i = 0; i < mPoints.size(); i++) {
         foreach (var point in mPoints)
         {
-            if (!point.mSide)
-            {
-                continue;
-            }
-            Vector2 D = point.mPosition - center;
-            float distance = radius - Mathf.Sqrt(D.x * D.x + D.y * D.y);
+            if (!point.mSide) continue;
+			
+            Vector3 D = point.mPosition - center;
+            float distance = radius - Mathf.Sqrt(D.x * D.x + D.z * D.z);
             point.mPosition += (D * distance) * 0.1f;
         }
     }
 
-    private void DrawLine(int a, int b)
+	public void Reshape()
+	{
+		for (int i = 0; i < iterNum; i++)
+        {
+            this.MoveEdgePointsToCircle();
+            this.MovePointsToNeighboursAverage();
+        }
+	}
+    
+    public void AllInOne()
     {
-        Vector3 posA = new Vector3(mPoints[a].mPosition.x, 0 ,mPoints[a].mPosition.y);
-        Vector3 posB = new Vector3(mPoints[b].mPosition.x, 0 ,mPoints[b].mPosition.y);
-        Gizmos.DrawLine(posA, posB);
+        InitializeHexagrid();
+        RemovingEdges();
+        SubdivideFaces();
+        Relax();
+        Reshape();
     }
+    
+    public List<Point> GetPoints() { return mPoints; }
+    public List<Quad> GetQuads() { return mSubQuads; }
+    public Neighbours[] GetNeighbours() { return mNeighbours; }
 
-    void OnDrawGizmos()
-    {
-        bool hidePoint = !bDrawPositions;
-        bool hideSector = bTriangulation && bRemovingEdges && bSubdivideFaces && bRelax;
-
-        Gizmos.color = Color.yellow;
-
-        if (!hidePoint)
-        {
-            foreach (var point in mPoints)
-            {
-                Vector3 pos = new Vector3(point.mPosition.x, 0, point.mPosition.y);
-                Gizmos.DrawSphere(pos, 0.1f);
-            }
-        }
-
-        Gizmos.color = Color.green;
-
-        if (!hideSector)
-        {
-            foreach (var tri in mTriangles)
-            {
-                if (tri.mValid)
-                {
-                    DrawLine(tri.mA, tri.mB);
-                    DrawLine(tri.mB, tri.mC);
-                    DrawLine(tri.mC, tri.mA);
-                }
-            }
-
-            foreach (var quad in mQuads)
-            {
-                DrawLine(quad.mA, quad.mB);
-                DrawLine(quad.mB, quad.mC);
-                DrawLine(quad.mC, quad.mD);
-                DrawLine(quad.mD, quad.mA);
-            }
-        }
-        else
-        {
-            for (int i = 0; i < mPoints.Count(); i++)
-            {
-                var neighbour = mNeighbours[i];
-                for (int j = 0; j < neighbour.count; j++)
-                {
-                    DrawLine(i, neighbour.mNeighbour[j]);
-                }
-            }
-        }
-    }
-
-    private void OnValidate()
-    {
-        mPoints = new List<Point>();
+	public void ResetGrid()
+	{
+		mPoints = new List<Point>();
         mTriangles = new List<Triangle>();
-        mQuads = new List<Quad>();
+        mBaseQuads = new List<Quad>();
+        mSubQuads = new List<Quad>();
         mNeighbours = new Neighbours[0];
+	}
 
-        if (bTriangulation)
+    public void SetParamsToDefault()
+    {
+        mSideSize = 6;
+        mSearchIterationCount = 12;
+        mSeed = 15911;
+        iterNum = 20;
+    }
+
+	public void pointsDebug()
+	{
+		GridDebug.DebugDrawPoints(mPoints);
+	}
+
+	public void trianglesDebug()
+	{
+		GridDebug.DebugDrawTriangles(mPoints, mTriangles);
+	}
+
+    public void quadsDebug()
+	{
+		GridDebug.DebugDrawQuads(mPoints, mBaseQuads);
+	}
+
+    public void subQuadsDebug()
+	{
+		GridDebug.DebugDrawQuads(mPoints, mSubQuads);
+	}
+
+    public void neighboursDebug()
+    {
+        if (debugPointIndex < 0 || debugPointIndex >= mNeighbours.Count())
         {
-            this.Triangulation();
-
-            if (bRemovingEdges)
-            {
-                this.RemovingEdges();
-
-                if (bSubdivideFaces)
-                {
-                    this.SubdivideFaces();
-
-                    if (bRelax)
-                    {
-                        if (bReshape)
-                        {
-                            for (int i = 0; i < iterNum; i++)
-                            {
-                                this.Reshape();
-                                this.Relax();
-                            }
-                        }
-                        else
-                        {
-                            for (int i = 0; i < iterNum; i++)
-                            {
-                                this.Relax();
-                            }
-                        }
-                        
-                    }
-                }
-            }
+            Debug.Log("Find Neighbours fail! Index " + debugPointIndex.ToString() + " is out of bounds!");
+            return;
         }
-        
-        
-        
+
+        GridDebug.DebugDrawNeighbours(mPoints, debugPointIndex, mNeighbours[debugPointIndex]);
     }
 
 }
