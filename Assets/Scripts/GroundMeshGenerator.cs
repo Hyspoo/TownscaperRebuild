@@ -155,12 +155,26 @@ public class GroundMeshGenerator : MonoBehaviour
 
         // Triangle index
         int[] triangles = new int[(vertices.Count() - 1) * 3];
-        for (int j = 0; j < vertices.Count() - 1; j++)
+
+        if(isUp) // Create upward faces
         {
-            triangles[j*3] = 0;
-            triangles[j*3 + 2] = j + 1;
-            if (j != vertices.Count() - 2) { triangles[j*3 + 1] = j + 2; }
-            else { triangles[j*3 + 1] = 1; }
+            for (int j = 0; j < vertices.Count() - 1; j++)
+            {
+                triangles[j*3] = 0;
+                triangles[j*3 + 2] = j + 1;
+                if (j != vertices.Count() - 2) { triangles[j*3 + 1] = j + 2; }
+                else { triangles[j*3 + 1] = 1; }
+            }
+        }
+        else // Create downward faces
+        {
+            for (int j = 0; j < vertices.Count() - 1; j++)
+            {
+                triangles[j*3] = 0;
+                triangles[j*3 + 1] = j + 1;
+                if (j != vertices.Count() - 2) { triangles[j*3 + 2] = j + 2; }
+                else { triangles[j*3 + 2] = 1; }
+            }
         }
 
         mesh.triangles = triangles;
@@ -208,52 +222,57 @@ public class GroundMeshGenerator : MonoBehaviour
 
     void AddBlock(GameObject detector)
     {
-        Debug.Log("AddBlock entered!");
-
         string[] info = detector.name.Split(' ');
-
+        
         int pointIndex = int.Parse(info[1]);
         int layer = int.Parse(info[2]);
 
         if (layer <= 0 || mPoints[pointIndex].mSide) return;
 
+        Debug.Log($"AddBlock() start! Block to add: Block {pointIndex} {layer}");
+
+        if (detector.transform.parent.name != "Ground Detectors") detector.SetActive(false);
+
         Transform block = new GameObject($"Block {pointIndex} {layer}").GetComponent<Transform>();
 
-        var upBlockDetector = GameObject.Find($"Block {pointIndex} {layer + 1}/Detector {pointIndex} down");
-        if (upBlockDetector == null)
+        Transform upDetector = GenerateHorizonalDetector(pointIndex, layer, true).GetComponent<Transform>();
+        upDetector.parent = block;
+        upDetector.Translate(Vector3.up * layerHeight / 2);
+
+        var upBlock = GameObject.Find($"Block {pointIndex} {layer + 1}");
+        if (upBlock != null)
         {
-            Transform upDetector = GenerateHorizonalDetector(pointIndex, layer, true).GetComponent<Transform>();
-            upDetector.parent = block;
-            upDetector.Translate(Vector3.up * layerHeight / 2);
+            upDetector.gameObject.SetActive(false);
+
+            Transform upBlockDetector = upBlock.transform.Find($"Detector {pointIndex} {layer}");
+            if (upBlockDetector.gameObject.activeSelf) upBlockDetector.gameObject.SetActive(false);
         }
-        else
+
+        Transform downDetector = GenerateHorizonalDetector(pointIndex, layer, false).GetComponent<Transform>();
+        downDetector.parent = block;
+        downDetector.Translate(Vector3.down * layerHeight / 2);
+
+        var downBlock = GameObject.Find($"Block {pointIndex} {layer - 1}");
+        if (downBlock != null)
         {
-            Destroy(upBlockDetector);
+            downDetector.gameObject.SetActive(false);
+
+            Transform downBlockDetector = downBlock.transform.Find($"Detector {pointIndex} {layer}");
+            if (downBlockDetector.gameObject.activeSelf) downBlockDetector.gameObject.SetActive(false);
         }
-        
-        var downBlockDetector = GameObject.Find($"Block {pointIndex} {layer - 1}/Detector {pointIndex} up");
-        if (downBlockDetector == null)
-        {
-            Transform downDetector = GenerateHorizonalDetector(pointIndex, layer, false).GetComponent<Transform>();
-            downDetector.parent = block;
-            downDetector.Translate(Vector3.down * layerHeight / 2);
-        }
-        else
-        {
-            Destroy(downBlockDetector);
-        }
-        
+
         foreach (int neighbourIndex in mNeighbours[pointIndex].mNeighbour)
         {
-            var sideBlockDetector = GameObject.Find($"Block {neighbourIndex} {layer}/Detector {pointIndex} {layer}");
-            if (sideBlockDetector == null)
+            Transform sideDetector = GenerateSideDetector(pointIndex, neighbourIndex, layer).GetComponent<Transform>();
+            sideDetector.parent = block;
+
+            var sideBlock = GameObject.Find($"Block {neighbourIndex} {layer}");
+            if (sideBlock != null)
             {
-                Transform sideDetector = GenerateSideDetector(pointIndex, neighbourIndex, layer).GetComponent<Transform>();
-                sideDetector.parent = block;
-            }
-            else
-            {
-                Destroy(sideBlockDetector);
+                sideDetector.gameObject.SetActive(false);
+
+                Transform sideBlockDetector = sideBlock.transform.Find($"Detector {pointIndex} {layer}");
+                if (sideBlockDetector.gameObject.activeSelf) sideBlockDetector.gameObject.SetActive(false);
             }
         }
 
@@ -262,7 +281,47 @@ public class GroundMeshGenerator : MonoBehaviour
 
     void DeleteBlock(GameObject detector)
     {
-        Debug.Log("PONG! block deleted!");
+        GameObject block = detector.transform.parent.gameObject;
+
+        string[] info = block.name.Split(' ');
+        if (info[0] == "Ground") return;
+
+        int pointIndex = int.Parse(info[1]);
+        int layer = int.Parse(info[2]);
+
+        Debug.Log($"PONG! DeleteBlock() start! Block to delete: Block {pointIndex} {layer}");
+
+        Destroy(block);
+
+        var upBlock = GameObject.Find($"/Block {pointIndex} {layer + 1}");
+        if (upBlock != null)
+        {
+            Transform upBlockDetector = upBlock.transform.Find($"Detector {pointIndex} {layer}");
+            Debug.Assert(upBlockDetector, $"Warning! upBlock {pointIndex} {layer + 1} exists but its Detector {pointIndex} {layer} doesn't exist!");
+
+            if (!upBlockDetector.gameObject.activeSelf) upBlockDetector.gameObject.SetActive(true);
+        }
+        
+        var downBlock = GameObject.Find($"Block {pointIndex} {layer - 1}");
+        if (downBlock != null)
+        {
+            Transform downBlockDetector = downBlock.transform.Find($"Detector {pointIndex} {layer}");
+            Debug.Assert(downBlockDetector, $"Warning! downBlock {pointIndex} {layer - 1} exists but its Detector {pointIndex} {layer} doesn't exist!");
+
+            if (!downBlockDetector.gameObject.activeSelf) downBlockDetector.gameObject.SetActive(true);
+        }
+        
+        foreach (int neighbourIndex in mNeighbours[pointIndex].mNeighbour)
+        {
+            var sideBlock = GameObject.Find($"Block {neighbourIndex} {layer}");
+            if (sideBlock != null)
+            {
+                var sideBlockDetector = sideBlock.transform.Find($"Detector {pointIndex} {layer}");
+                Debug.Assert(sideBlockDetector, $"Warning! sideBlock {neighbourIndex} {layer} exists but its Detector {pointIndex} {layer} doesn't exist!");
+
+                if (!sideBlockDetector.gameObject.activeSelf) sideBlockDetector.gameObject.SetActive(true);
+            }
+        }
     }
 
     public void GroundMeshDebug()
@@ -343,8 +402,11 @@ public class GroundMeshGenerator : MonoBehaviour
             } else {
                 currentMouseHoverDetector = hitInfo.transform.gameObject;
                 if (currentMouseHoverDetector != lastMouseHoverDetector) {
-                    lastMouseHoverDetector.GetComponent<MeshRenderer>().material.color = detectorColor;//lastMouseHoverDetector.GetComponent<Animator>().SetBool("MouseHover", false);
-                    currentMouseHoverDetector.GetComponent<MeshRenderer>().material.color = detectorHighlighted;//currentMouseHoverDetector.GetComponent<Animator>().SetBool("MouseHover", true);
+                    if(lastMouseHoverDetector != null)
+                    {
+                        lastMouseHoverDetector.GetComponent<MeshRenderer>().material.color = detectorColor;//lastMouseHoverDetector.GetComponent<Animator>().SetBool("MouseHover", false);
+                        currentMouseHoverDetector.GetComponent<MeshRenderer>().material.color = detectorHighlighted;//currentMouseHoverDetector.GetComponent<Animator>().SetBool("MouseHover", true);
+                    }
                 }
             }
 
@@ -378,8 +440,11 @@ public class GroundMeshGenerator : MonoBehaviour
         } else {
             if (onHit == true) {
                 onHit = false;
-                currentMouseHoverDetector.GetComponent<MeshRenderer>().material.color = detectorColor;
-                //currentMouseHoverDetector.GetComponent<Animator>().SetBool("MouseHover", false);
+                if(currentMouseHoverDetector != null)
+                {
+                    currentMouseHoverDetector.GetComponent<MeshRenderer>().material.color = detectorColor;
+                    //currentMouseHoverDetector.GetComponent<Animator>().SetBool("MouseHover", false);
+                }
             }
         }
     }
